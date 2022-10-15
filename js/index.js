@@ -10,6 +10,7 @@ const controlsWapper = document.querySelector(
   '[data-slide="controls-wrapper"]'
 );
 const slideItems = document.querySelectorAll('[data-slide="item"]');
+let controlButtons;
 
 const state = {
   startingPoint: 0,
@@ -87,21 +88,13 @@ function noMouseUp(event) {
   slideItem.removeEventListener('mousemove', onMouseMove);
 }
 
-function onControlButtonClick(event, index, controlButtons) {
-  const controlButton = event.currentTarget;
-  controlButtons.forEach(function (controlButtonItem) {
-    controlButtonItem.classList.remove('active');
-  });
-  controlButton.classList.add('active');
-  setVisibleSlide({ index: index });
-  console.log('clicou');
+function onControlButtonClick(index) {
+  setVisibleSlide({ index });
 }
 
 function setListeners() {
-  const controlButtons = document.querySelectorAll(
-    '[data-slide="control-button]'
-  );
-  console.log(controlButtons);
+  controlButtons = document.querySelectorAll('[data-slide="control-button"]');
+
   //Adicionar evento nos indicatons
   controlButtons.forEach(function (controlButton, index) {
     controlButton.addEventListener('click', function (event) {
@@ -139,3 +132,6 @@ initSlider();
 //   const elementClicked = event.target;
 //   console.log(elementClicked);
 // });
+
+//Parei em 2h35m08s do vídeo
+//https://www.youtube.com/watch?v=eUwqZrgASM0
