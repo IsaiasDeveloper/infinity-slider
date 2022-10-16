@@ -122,10 +122,12 @@ function onMouseMove(event, index) {
 }
 //Soltar
 function noMouseUp(event) {
+  const pointsToMove = event.type.includes('touch') ? 50 : 150;
+  // console.log(event.type);
   const slideItem = event.currentTarget;
-  if (state.movement < -150) {
+  if (state.movement < -pointsToMove) {
     nextSlide();
-  } else if (state.movement > 150) {
+  } else if (state.movement > pointsToMove) {
     previousSlide();
   } else {
     setVisibleSlide({ index: state.currentSlideIndex, animate: true });
@@ -134,15 +136,40 @@ function noMouseUp(event) {
   slideItem.removeEventListener('mousemove', onMouseMove);
 }
 
+function onTouchStart(event, index) {
+  event.clientX = event.touches[0].clientX;
+  onMouseDown(event, index);
+  const slideItem = event.currentTarget;
+  slideItem.addEventListener('touchmove', onTouchMove);
+}
+
+function onTouchMove(event) {
+  event.clientX = event.touches[0].clientX;
+  onMouseMove(event);
+}
+function onTouchEnd(event) {
+  noMouseUp(event);
+  const slideItem = event.currentTarget;
+  slideItem.removeEventListener('touchmove', onTouchMove);
+}
+
 function onControlButtonClick(index) {
   setVisibleSlide({ index: index + 2, animate: true });
 }
 
 function onSlideListTransitionEnd() {
-  if (state.currentSlideIndex === slideItems.length - 2) {
+  const slideItem = slideItems[state.currentSlideIndex];
+
+  if (
+    slideItem.classList.contains('slide-cloned') &&
+    Number(slideItem.dataset.index) > 0
+  ) {
     setVisibleSlide({ index: 2, animate: false });
   }
-  if (state.currentSlideIndex === 1) {
+  if (
+    slideItem.classList.contains('slide-cloned') &&
+    Number(slideItem.dataset.index) < 0
+  ) {
     setVisibleSlide({ index: slideItems.length - 3, animate: false });
   }
 }
@@ -176,8 +203,15 @@ function setListeners() {
     slideItem.addEventListener('mousedown', function (event) {
       onMouseDown(event, index);
     }),
-      //Soltar
+      //Soltar no mobile
       slideItem.addEventListener('mouseup', noMouseUp);
+
+    //Apertar no mobile
+    slideItem.addEventListener('touchstart', function (event) {
+      onTouchStart(event, index);
+    }),
+      //Soltar
+      slideItem.addEventListener('touchend', onTouchEnd);
   });
 
   navNextButton.addEventListener('click', nextSlide);
@@ -189,6 +223,14 @@ function setListeners() {
   });
   slideWrapper.addEventListener('mouseleave', function () {
     setAutoPlay();
+  });
+  //Manter posicionamento padrão
+  let resizeTimeOut;
+  window.addEventListener('resize', function () {
+    this.clearTimeout(resizeTimeOut);
+    resizeTimeOut = setTimeout(function () {
+      setVisibleSlide({ index: state.currentSlideIndex, animate: true });
+    }, 1000);
   });
 }
 
