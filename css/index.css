@@ -85,7 +85,7 @@ body {
   background-color: transparent;
   color: #fff;
   font-size: 19px;
-  margin: 0 3px;
+  margin: 0 5px;
   cursor: pointer;
 }
 .slide-control-button.active {
